@@ -1,0 +1,73 @@
+<html>
+	<head>
+		<title>test</title>
+		
+		<style>
+		.cursor {
+			
+		}
+		.cursor::before {
+			background: blue;
+			content: " ";
+			width: 3px;
+			height: .9em;
+			position: absolute;
+			margin-top: 1px
+		}
+		</style>
+	</head>
+	<body>
+		<input type="text"/ id="keyhole-input" />
+		<br /><br />
+		<div id="text-display"><span class="cursor">T</span>his is content text.</div>
+		<div id="width-indicator" style="background:green;">a</div>
+	</body>
+
+	
+<script>
+
+
+// Functions for testing and exploration
+var printBoundingBox = function ( element ) {
+	console.log( 'UL: ' + element.offsetLeft + ', ' + element.offsetTop );
+	console.log( 'LR: ' + ( element.offsetLeft + element.offsetWidth ) + ', ' + ( element.offsetTop + element.offsetHeight ) );
+};
+
+var measureText = function ( textContent ) {
+	// This will require that we set the font size specifically. For now we will assume the width of each char is 8px
+	
+};
+var charColGuess = function ( eleLeft, clickX ) {
+	var tmp = clickX - eleLeft;
+	var charCount = Math.round( tmp / 8 );
+	document.getElementById( 'width-indicator' ).style.width = charCount * 8 + 'px';
+	return charCount;
+};
+
+</script>
+<script>
+var cursorPosition = {
+	col: 1,
+	row: 1
+};
+
+var keyhole = document.getElementById( 'keyhole-input' );
+var displayEle = document.getElementById( 'text-display' );
+
+
+// Def element event functions
+keyhole.onchange = function ( event ) { debugger; };
+keyhole.onkeypress = function ( event ) { debugger; };
+
+keyhole.onpaste = function ( event ) { debugger; };
+
+displayEle.onclick = function ( event ) {
+	console.log ( 'Display Version click' );
+	printBoundingBox( event.target );
+	console.log( charColGuess( event.target.offsetLeft, event.clientX ) );
+
+};
+
+</script>
+	
+</html>

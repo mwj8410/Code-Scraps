@@ -1,0 +1,108 @@
+<html>
+	<head>
+		<title>test</title>
+	</head>
+	<body>
+		<div id="result"></div>
+	</body>
+	
+<script>
+var Localizer = ( function () {
+	// Private
+		var languageName = '',
+			languageObject = null,
+			measurementSystemList = [],
+			
+			getTranslation = function (key) {
+				return languageObject[key];
+			},
+			resolveTokens = function (text, data) {
+				if (typeof data === 'object') {
+					Object.keys(data).forEach(
+						function (item) {
+							text = text.replace(/{[^\s]*}/g, data[item]);
+						}
+					);
+				}
+				return text;
+			}
+		;
+		
+	// Public
+		return {			
+			setLanguage : function (newLanguageName, newLanguageObject) {
+				languageName = newLanguageName
+				languageObject = newLanguageObject;
+			},
+			
+			getCurrentLanguage: function () {
+				return languageName;
+			},
+			localize: function (key, data) {
+				if (typeof key !== 'string') {
+					return 'Invalid phrase-key type';
+				}
+				
+				var translation = getTranslation(key);
+				
+				if (typeof translation === 'string') {
+					return resolveTokens(translation); 
+				}
+				if (typeof translation === 'function') {
+					return resolveTokens(translation(data), data);
+				}
+			}
+		};
+	} )();
+
+
+
+// Tests
+Localizer.setLanguage(
+	'English',
+	{
+		namedPhrase1: "translated 1",
+		namedPhrase2: function () {
+			return "translated 2"
+		},
+		namedPhrase3: function (data) {
+			return "translated " + data.number;
+		},
+		namedPhrase4: function (data) {
+			return "translated {testToken}";
+		},
+		namedPhrase5: function (data) {
+			return "translated {test token}";
+		}
+	}
+);
+
+if (Localizer.localize('namedPhrase1') === 'translated 1') {
+	console.log( 'Test 1 Passed' );
+} else {
+	console.log( 'Failed to correctly translate simple phrase' );
+}
+if (Localizer.localize('namedPhrase2') === 'translated 2') {
+	console.log( 'Test 2 Passed' );
+} else {
+	console.log( 'Failed to correctly translate a complex phrase' );
+}
+if (Localizer.localize('namedPhrase3', { number: 3 }) === 'translated 3') {
+	console.log( 'Test 3 Passed' );
+} else {
+	console.log( 'Failed to correctly translate a complex phrase with simple data.' );
+}
+if (Localizer.localize('namedPhrase4', { testToken: 4 }) === 'translated 4') {
+	console.log( 'Test 4 Passed' );
+} else {
+	console.log( 'Failed to correctly translate a tokenized phrase.' );
+}
+if (Localizer.localize('namedPhrase5', { 'test token': 5 }) === 'translated {test token}') {
+	console.log( 'Test 5 Passed' );
+} else {
+	console.log( 'Failed to correctly ignore a token that includes a space.' );
+}
+
+
+</script>
+</html>

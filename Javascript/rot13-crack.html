@@ -1,0 +1,25 @@
+<div id="output"></div>
+<script>
+var output = [];
+var adjustCodeForRot13 = function (inputCode) {
+	return inputCode < 110 && inputCode + 13 || inputCode - 13;
+};
+
+"Fraq hf gur pbqr lbh hfrq gb qrpbqr guvf zrffntr"
+	.toLowerCase()
+	.split( '' )
+	.forEach(
+		function(letter) {
+			if ( letter === ' ' ) {
+				output.push( ' ' );
+			} else {
+				output.push( 
+					String.fromCharCode(
+						adjustCodeForRot13(letter.charCodeAt(0))
+					)
+				);
+			}
+		}
+	);
+document.getElementById( 'output' ).innerHTML = output.join('');
+</script>
