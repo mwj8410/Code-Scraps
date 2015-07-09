@@ -1,0 +1,98 @@
+<style>
+body {
+	background: grey;
+}
+#resultList{
+	height: 200px;
+	background: white;
+	overflow: scroll;
+}
+.recordTitle {
+	color: black;
+}
+.recordPublished {
+	color: grey;
+}
+</style>
+<body>
+    <div id="resultList"></div>
+</body>
+
+<script>
+var DisplayController = (function(){
+    var displayElement = document.getElementById('resultList'),
+		continueToCache = true,
+		currentMaxScrollMeasurement,
+		currentRecordBlock,
+		
+		setScrollAction = function () {
+			displayElement.onscroll = function (event) {
+				if (displayElement.scrollTop === currentMaxScrollMeasurement &&continueToCache) {
+					DisplayController.loadNextRecordBlock();
+				}
+			};
+		},
+		createRecordElement = function (record) {
+			var output = document.createElement('div');
+			output.innerHTML = String.prototype.concat(
+				'<div class="recordTitle">', record.title, '</div>',
+				'<div class="recordPublished">', record.published, '</div>',
+				'<br>'
+			);
+			return output;
+		};
+	
+    return {
+		init: function () {
+			setScrollAction();
+			currentRecordBlock = 0;
+			CommunicationController.getNextRecordSet(currentRecordBlock, this.addRecordSet);
+		},
+        addRecordSet: function (records) {
+			if (records.length === 0) {
+				continueToCache = false;
+			}
+            records.forEach(
+				function(record) {
+					displayElement.appendChild(createRecordElement(record));
+				}
+            );
+			currentMaxScrollMeasurement = displayElement.scrollHeight - displayElement.clientHeight;
+        },
+		loadNextRecordBlock: function () {
+			currentRecordBlock++;
+			CommunicationController.getNextRecordSet(currentRecordBlock, this.addRecordSet);
+		}
+    };
+})();
+
+var CommunicationController = (function(){
+	var blockSize = 5,
+		resourceURL = 'http://www.stellarbiotechnologies.com/media/press-releases/json',
+	
+		makeRequest = function (blockNumber, callback) {
+			var req = new XMLHttpRequest();
+
+			req.open('GET', getRequestPath(blockNumber), true);
+			req.onreadystatechange = function() {
+				if (req.readyState === 4) {
+					if (req.status >= 200 && req.status < 400) {
+						callback(JSON.parse(req.responseText).news);
+					}
+				}
+			};
+			req.send();
+		},
+		getRequestPath = function (blockNumber) {
+			return resourceURL + '?' + 'limit=' + blockSize + '&' + 'offset=' + blockNumber;
+		};
+	
+	return {
+		getNextRecordSet: function (blockNumber, callback) {
+			makeRequest(blockNumber, callback);
+		}
+	};
+})();
+
+DisplayController.init();
+</script>
