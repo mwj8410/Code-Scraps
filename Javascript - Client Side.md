@@ -19,16 +19,3 @@ addEvent(window, 'resize', () => {
   console.log('hit');
 });
 ```
-
-### Functions for transforming an object name to a TitleCase string
-```javascript
-const camelCaseToTitleCase = (str) => str.match(/[A-Z]*[^A-Z]+/g)
-		.map((word) => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase())
-		.join(' ')
- ```
- 
- Usage:
- ```javascript
- camelCaseToTitleCase('camelCaseString')
- ```
- 
